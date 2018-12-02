@@ -41,7 +41,6 @@ public class MysqlGetStats {
 		try {
 			conn = DriverManager.getConnection(ini.getProperty("conn"),
 					ini.getProperty("user"), ini.getProperty("password"));
-			conn.setAutoCommit(false);
 			stmt = conn.createStatement();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

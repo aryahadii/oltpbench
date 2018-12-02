@@ -162,7 +162,7 @@ public class TPCHLoader extends Loader<TPCHBenchmark> {
         CastTypes.DOUBLE, // s_acctbal
         CastTypes.STRING, // s_comment
     };
-    
+
     @Override
     public List<LoaderThread> createLoaderThreads() throws SQLException {
         // TODO Auto-generated method stub
@@ -314,7 +314,7 @@ public class TPCHLoader extends Loader<TPCHBenchmark> {
             this.types = types;
             this.parent = parent;
         }
-        
+
         private String getFileFormat(){
             String format = workConf.getXmlConfig().getString("fileFormat");
             /*
@@ -322,16 +322,16 @@ public class TPCHLoader extends Loader<TPCHBenchmark> {
                 that the files are csv.
             */
             if (format == null) return "csv";
-            
+
             if((!"csv".equals(format) && !"tbl".equals(format))){
                 throw new IllegalArgumentException("Configuration doesent"
                         + " have a valid fileFormat");
             }
             return format;
         }
-        
+
         private Pattern getFormatPattern(String format){
-            
+
             if("csv".equals(format)){
                 // The following pattern parses the lines by commas, except for
                 // ones surrounded by double-quotes. Further, strings that are
@@ -341,7 +341,7 @@ public class TPCHLoader extends Loader<TPCHBenchmark> {
                 return Pattern.compile("[^\\|]*\\|");
             }
         }
-        
+
         private int getFormatGroup(String format){
             if("csv".equals(format)){
                return  1;
@@ -368,14 +368,13 @@ public class TPCHLoader extends Loader<TPCHBenchmark> {
                 this.conn = DriverManager.getConnection(workConf.getDBConnection(),
                         workConf.getDBUsername(),
                         workConf.getDBPassword());
-                this.conn.setAutoCommit(false);
 
                 try {
                     now = new java.util.Date();
                     LOG.debug("\nStart " + tableName + " load @ " + now + "...");
                     String format = getFileFormat();
                     File file = new File(workConf.getDataDir()
-                                         , tableName.toLowerCase() + "." 
+                                         , tableName.toLowerCase() + "."
                                                  + format);
                     br = new BufferedReader(new FileReader(file));
                     String line;
@@ -396,7 +395,7 @@ public class TPCHLoader extends Loader<TPCHBenchmark> {
                                 if (field.charAt(0) == '\"') {
                                     field = field.substring(1, field.length() - 1);
                                 }
-                                
+
                                 if(group==0){
                                     field = field.substring(0, field.length() -1);
                                 }

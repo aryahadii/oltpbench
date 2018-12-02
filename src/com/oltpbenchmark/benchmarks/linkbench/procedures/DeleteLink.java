@@ -29,9 +29,9 @@ import com.oltpbenchmark.api.SQLStmt;
 import com.oltpbenchmark.benchmarks.linkbench.LinkBenchConstants;
 
 public class DeleteLink extends Procedure{
-    
+
     private static final Logger LOG = Logger.getLogger(DeleteLink.class);
-    
+
     private PreparedStatement stmt1 = null;
     private PreparedStatement stmt2 = null;
     private PreparedStatement stmt3 = null;
@@ -47,12 +47,12 @@ public class DeleteLink extends Procedure{
     );
     public final SQLStmt deleteLink = new SQLStmt(
             "DELETE FROM linktable " +
-                       " WHERE id1 = ?" + 
-                       " AND id2 = ?" + 
+                       " WHERE id1 = ?" +
+                       " AND id2 = ?" +
                        " AND link_type = ?"
         );
     public final SQLStmt hideLink = new SQLStmt(
-            "UPDATE linktable SET visibility =  ?"+ 
+            "UPDATE linktable SET visibility =  ?"+
                        " WHERE id1 = ?"+
                        " AND id2 = ?"+
                        " AND link_type = ?"
@@ -65,7 +65,7 @@ public class DeleteLink extends Procedure{
                        " count = IF (count = 0, 0, count - 1)" +
                        " , time = ?, version = version + 1"
         );
-    
+
     public boolean run(Connection conn, long id1, long link_type, long id2,
             boolean noinverse, boolean expunge) throws SQLException {
         if (LOG.isDebugEnabled()) {
@@ -73,9 +73,6 @@ public class DeleteLink extends Procedure{
                                "." + id2 +
                                "." + link_type);
           }
-
-          // conn.setAutoCommit(false);
-
           // First do a select to check if the link is not there, is there and
           // hidden, or is there and visible;
           // Result could be either NULL, VISIBILITY_HIDDEN or VISIBILITY_DEFAULT.
@@ -85,14 +82,14 @@ public class DeleteLink extends Procedure{
           // value of visible to maintain link counts.  Without the lock,
           // a concurrent transaction could also see the link as visible and
           // we would double-decrement the link count.
-        
+
           if(stmt1 == null)
               stmt1 = this.getPreparedStatement(conn, selectLink);
-          
-          stmt1.setLong(1, id1);          
-          stmt1.setLong(2, id2);          
-          stmt1.setLong(3, link_type);          
-          
+
+          stmt1.setLong(1, id1);
+          stmt1.setLong(2, id2);
+          stmt1.setLong(3, link_type);
+
           if (LOG.isTraceEnabled()) {
               LOG.trace(selectLink);
           }
@@ -123,11 +120,11 @@ public class DeleteLink extends Procedure{
             boolean updateCount = (visibility != LinkBenchConstants.VISIBILITY_HIDDEN);
 
             // either delete or mark the link as hidden
-            if(stmt2 == null) 
+            if(stmt2 == null)
                 stmt2 = this.getPreparedStatement(conn, hideLink);
-            if(stmt3 == null) 
+            if(stmt3 == null)
                 stmt3 = this.getPreparedStatement(conn, deleteLink);
-            
+
             PreparedStatement p;
             if (!expunge) {
                 p = stmt2;
@@ -156,15 +153,15 @@ public class DeleteLink extends Procedure{
             long currentTime = (new Date()).getTime();
             if(stmt4==null)
               stmt4 = this.getPreparedStatement(conn, updateLink);
-            stmt4.setLong(1, id1);          
-            stmt4.setLong(2, link_type);          
-            stmt4.setLong(3, currentTime);          
-            stmt4.setLong(4, currentTime);          
-            
+            stmt4.setLong(1, id1);
+            stmt4.setLong(2, link_type);
+            stmt4.setLong(3, currentTime);
+            stmt4.setLong(4, currentTime);
+
             if (LOG.isDebugEnabled()) {
                 LOG.trace(updateLink);
             }
-            
+
             stmt4.executeUpdate();
           }
           conn.commit();
